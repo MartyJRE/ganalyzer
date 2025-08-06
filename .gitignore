@@ -1,0 +1,126 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
+
+# Build output
+build/
+dist/
+bin/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE - VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# IDE - IntelliJ IDEA / GoLand / WebStorm
+.idea/
+*.iws
+*.iml
+*.ipr
+*.swp
+*.swo
+
+# IDE - Vim
+*.swp
+*.swo
+*~
+
+# IDE - Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# AI Assistant files and directories
+.claude/
+.cursor/
+.copilot/
+.codeium/
+.tabnine/
+.aider/
+claude.md
+cursor.md
+copilot.md
+codeium.md
+tabnine.md
+aider.md
+.ai-prompts/
+.ai-sessions/
+.ai-context/
+ai-context.txt
+ai-prompts.txt
+ai-session.txt
+.anthropic/
+.openai/
+.github-copilot/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Logs
+*.log
+logs/
+
+# Coverage reports
+coverage.txt
+coverage.html
+coverage.out
+
+# Test cache
+.cache/
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# Personal notes and scratch files
+notes.md
+scratch.md
+todo.md
+TODO.md
+NOTES.md
+personal/
+scratch/
+
+# Generated documentation (keep only source docs)
+docs/generated/
+
+# Backup files
+*.bak
+*.backup
+*~

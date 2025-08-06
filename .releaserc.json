@@ -1,0 +1,106 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "conventionalcommits",
+        "releaseRules": [
+          { "type": "feat", "release": "minor" },
+          { "type": "fix", "release": "patch" },
+          { "type": "perf", "release": "patch" },
+          { "type": "revert", "release": "patch" },
+          { "type": "docs", "scope": "README", "release": "patch" },
+          { "type": "style", "release": false },
+          { "type": "refactor", "release": "patch" },
+          { "type": "test", "release": false },
+          { "type": "build", "release": false },
+          { "type": "ci", "release": false },
+          { "type": "chore", "release": false },
+          { "breaking": true, "release": "major" }
+        ],
+        "parserOpts": {
+          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "BREAKING"]
+        }
+      }
+    ],
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "conventionalcommits",
+        "presetConfig": {
+          "types": [
+            { "type": "feat", "section": "🚀 Features" },
+            { "type": "fix", "section": "🐛 Bug Fixes" },
+            { "type": "perf", "section": "⚡ Performance Improvements" },
+            { "type": "revert", "section": "⏪ Reverts" },
+            { "type": "docs", "section": "📚 Documentation" },
+            { "type": "style", "section": "💎 Styles", "hidden": true },
+            { "type": "refactor", "section": "📦 Code Refactoring" },
+            { "type": "test", "section": "🚨 Tests", "hidden": true },
+            { "type": "build", "section": "🛠 Build System", "hidden": true },
+            { "type": "ci", "section": "⚙️ Continuous Integration", "hidden": true },
+            { "type": "chore", "section": "♻️ Chores", "hidden": true }
+          ]
+        }
+      }
+    ],
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "CHANGELOG.md",
+        "changelogTitle": "# Changelog\n\nAll notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines."
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "echo 'VERSION=${nextRelease.version}' >> $GITHUB_ENV && echo 'TAG=${nextRelease.gitTag}' >> $GITHUB_ENV"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "release/ganalyzer-linux-amd64",
+            "name": "ganalyzer-linux-amd64",
+            "label": "Linux AMD64 Binary"
+          },
+          {
+            "path": "release/ganalyzer-linux-arm64",
+            "name": "ganalyzer-linux-arm64",
+            "label": "Linux ARM64 Binary"
+          },
+          {
+            "path": "release/ganalyzer-darwin-amd64",
+            "name": "ganalyzer-darwin-amd64",
+            "label": "macOS AMD64 Binary"
+          },
+          {
+            "path": "release/ganalyzer-darwin-arm64",
+            "name": "ganalyzer-darwin-arm64",
+            "label": "macOS ARM64 (Apple Silicon) Binary"
+          },
+          {
+            "path": "release/ganalyzer-windows-amd64.exe",
+            "name": "ganalyzer-windows-amd64.exe",
+            "label": "Windows AMD64 Binary"
+          }
+        ],
+        "successComment": false,
+        "failComment": false,
+        "failTitle": false,
+        "labels": false,
+        "releasedLabels": false
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["CHANGELOG.md"],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ]
+  ]
+}
