@@ -3,7 +3,6 @@ package analyzer
 import (
 	"regexp"
 	"strings"
-	"unicode"
 )
 
 // NameNormalizer handles contributor name normalization
@@ -12,6 +11,8 @@ type NameNormalizer struct {
 	whitespaceRegex   *regexp.Regexp
 	diacriticReplacer *strings.Replacer
 }
+
+// TODO: Michal Pekny is not working correctly
 
 // NewNameNormalizer creates a new name normalizer
 func NewNameNormalizer() *NameNormalizer {
@@ -69,36 +70,4 @@ func (nn *NameNormalizer) NormalizeName(name string) string {
 	normalized = nn.whitespaceRegex.ReplaceAllString(normalized, " ")
 
 	return normalized
-}
-
-// removeDiacritics is a fallback function for any diacritics not in the replacer
-func (nn *NameNormalizer) removeDiacritics(s string) string {
-	var result strings.Builder
-	for _, r := range s {
-		if r < 127 {
-			// ASCII characters, keep as-is
-			result.WriteRune(r)
-		} else if unicode.Is(unicode.Latin, r) {
-			// Try to find ASCII equivalent for Latin characters
-			switch {
-			case r >= 'À' && r <= 'Ö':
-				result.WriteRune('A' + (r - 'À'))
-			case r >= 'Ø' && r <= 'ö':
-				if r <= 'Þ' {
-					result.WriteRune('O' + (r - 'Ø'))
-				} else {
-					result.WriteRune('a' + (r - 'à'))
-				}
-			case r >= 'ø' && r <= 'ÿ':
-				result.WriteRune('o' + (r - 'ø'))
-			default:
-				// Keep the character if we can't map it
-				result.WriteRune(r)
-			}
-		} else {
-			// Non-Latin characters, keep as-is
-			result.WriteRune(r)
-		}
-	}
-	return result.String()
 }

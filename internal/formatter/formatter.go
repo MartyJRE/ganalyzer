@@ -42,22 +42,38 @@ func (f *Formatter) Format(stats *types.GlobalStats, config Config, writer io.Wr
 }
 
 func (f *Formatter) formatTable(contributors []*types.ContributorStats, repos []*types.Repository, config Config, writer io.Writer) error {
-	fmt.Fprintf(writer, "Git Repository Analysis\n")
-	fmt.Fprintf(writer, "======================\n\n")
-
-	fmt.Fprintf(writer, "Found %d repositories:\n", len(repos))
-	for _, repo := range repos {
-		fmt.Fprintf(writer, "  - %s (%s)\n", repo.Name, repo.Path)
+	if _, err := fmt.Fprintf(writer, "Git Repository Analysis\n"); err != nil {
+		return err
 	}
-	fmt.Fprintf(writer, "\n")
+	if _, err := fmt.Fprintf(writer, "======================\n\n"); err != nil {
+		return err
+	}
+
+	if _, err := fmt.Fprintf(writer, "Found %d repositories:\n", len(repos)); err != nil {
+		return err
+	}
+	for _, repo := range repos {
+		if _, err := fmt.Fprintf(writer, "  - %s (%s)\n", repo.Name, repo.Path); err != nil {
+			return err
+		}
+	}
+	if _, err := fmt.Fprintf(writer, "\n"); err != nil {
+		return err
+	}
 
 	if len(contributors) == 0 {
-		fmt.Fprintf(writer, "No contributors found.\n")
+		if _, err := fmt.Fprintf(writer, "No contributors found.\n"); err != nil {
+			return err
+		}
 		return nil
 	}
 
-	fmt.Fprintf(writer, "Top Contributors:\n")
-	fmt.Fprintf(writer, "================\n\n")
+	if _, err := fmt.Fprintf(writer, "Top Contributors:\n"); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintf(writer, "================\n\n"); err != nil {
+		return err
+	}
 
 	nameWidth := 20
 	for _, contributor := range contributors {
@@ -72,8 +88,12 @@ func (f *Formatter) formatTable(contributors []*types.ContributorStats, repos []
 	nameWidth += 2
 
 	format := fmt.Sprintf("%%-%ds %%8s %%10s %%10s %%12s\n", nameWidth)
-	fmt.Fprintf(writer, format, "Name", "Commits", "Lines+", "Lines-", "Total Lines")
-	fmt.Fprintf(writer, format, strings.Repeat("-", nameWidth), "-------", "------", "------", "-----------")
+	if _, err := fmt.Fprintf(writer, format, "Name", "Commits", "Lines+", "Lines-", "Total Lines"); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintf(writer, format, strings.Repeat("-", nameWidth), "-------", "------", "------", "-----------"); err != nil {
+		return err
+	}
 
 	for _, contributor := range contributors {
 		name := contributor.Name
@@ -81,13 +101,15 @@ func (f *Formatter) formatTable(contributors []*types.ContributorStats, repos []
 			name = fmt.Sprintf("%s (aliases: %s)", contributor.Name, strings.Join(contributor.Aliases, ", "))
 		}
 
-		fmt.Fprintf(writer, format,
+		if _, err := fmt.Fprintf(writer, format,
 			name,
 			strconv.Itoa(contributor.CommitCount),
 			strconv.Itoa(contributor.LinesAdded),
 			strconv.Itoa(contributor.LinesDeleted),
 			strconv.Itoa(contributor.LinesChanged),
-		)
+		); err != nil {
+			return err
+		}
 	}
 
 	return nil

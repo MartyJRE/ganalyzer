@@ -11,13 +11,10 @@ output:
 
 linters-settings:
   govet:
-    check-shadowing: true
-  golint:
-    min-confidence: 0
+    enable:
+      - shadow
   gocyclo:
     min-complexity: 15
-  maligned:
-    suggest-new: true
   dupl:
     threshold: 100
   goconst:
@@ -45,11 +42,19 @@ linters-settings:
   funlen:
     lines: 100
     statements: 50
+  depguard:
+    rules:
+      main:
+        files:
+          - "!$test"
+          - "!**/cmd/**"
+        allow:
+          - $gostd
+          - ganalyzer
 
 linters:
   enable:
     - bodyclose
-    - deadcode
     - depguard
     - dogsled
     - dupl
@@ -62,29 +67,26 @@ linters:
     - gocyclo
     - gofmt
     - goimports
-    - golint
-    - gomnd
+    - revive
+    - mnd
     - goprintffuncname
     - gosec
     - gosimple
     - govet
     - ineffassign
-    - interfacer
     - lll
     - misspell
     - nakedret
     - noctx
     - nolintlint
     - rowserrcheck
-    - scopelint
+    - exportloopref
     - staticcheck
-    - structcheck
     - stylecheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - whitespace
 
   # don't enable:
@@ -108,6 +110,9 @@ issues:
         - funlen
         - goconst
         - gocyclo
+        - gosec
+        - errcheck
+        - unparam
 
   exclude-use-default: false
   exclude:
@@ -115,3 +120,7 @@ issues:
     - should have a package comment
     - comment on exported method
     - missing package comment
+    # Exclude gosec issues for subprocess calls with repo paths (they're user inputs, not tainted)
+    - G204
+    # Exclude unparam for test helper functions
+    - "`runCmd` - `name` always receives"

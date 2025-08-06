@@ -32,10 +32,8 @@ func TestAnalyzer_Integration(t *testing.T) {
 	testUser := repo.Contributors["Test User"]
 	if testUser == nil {
 		t.Error("Expected 'Test User' contributor not found")
-	} else {
-		if testUser.CommitCount == 0 {
-			t.Error("Expected at least one commit for Test User")
-		}
+	} else if testUser.CommitCount == 0 {
+		t.Error("Expected at least one commit for Test User")
 	}
 }
 
