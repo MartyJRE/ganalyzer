@@ -12,12 +12,12 @@ import (
 )
 
 type Config struct {
-	Directory       string
-	OutputFormat    string
-	TopN            int
-	SortBy          string
-	NormalizeNames  bool
-	ShowAliases     bool
+	Directory      string
+	OutputFormat   string
+	TopN           int
+	SortBy         string
+	NormalizeNames bool
+	ShowAliases    bool
 }
 
 type Formatter struct{}
@@ -80,7 +80,7 @@ func (f *Formatter) formatTable(contributors []*types.ContributorStats, repos []
 		if config.ShowAliases && config.NormalizeNames && len(contributor.Aliases) > 0 {
 			name = fmt.Sprintf("%s (aliases: %s)", contributor.Name, strings.Join(contributor.Aliases, ", "))
 		}
-		
+
 		fmt.Fprintf(writer, format,
 			name,
 			strconv.Itoa(contributor.CommitCount),

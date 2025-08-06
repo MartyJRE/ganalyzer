@@ -11,7 +11,7 @@ import (
 	"ganalyzer/pkg/types"
 )
 
-type Analyzer struct{
+type Analyzer struct {
 	normalizer *NameNormalizer
 	normalize  bool
 }
@@ -82,7 +82,7 @@ func (a *Analyzer) analyzeCommits(repo *types.Repository) error {
 				Aliases: make([]string, 0),
 			}
 		}
-		
+
 		// Add this authorName as an alias if normalization is enabled and it's different from the stored name
 		if a.normalize && authorName != repo.Contributors[contributorKey].Name {
 			aliases := repo.Contributors[contributorKey].Aliases
@@ -97,7 +97,7 @@ func (a *Analyzer) analyzeCommits(repo *types.Repository) error {
 				repo.Contributors[contributorKey].Aliases = append(repo.Contributors[contributorKey].Aliases, authorName)
 			}
 		}
-		
+
 		repo.Contributors[contributorKey].CommitCount += count
 	}
 

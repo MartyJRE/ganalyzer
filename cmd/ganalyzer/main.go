@@ -22,7 +22,7 @@ func main() {
 	flag.BoolVar(&config.NormalizeNames, "normalize", false, "Normalize contributor names (remove diacritics, punctuation, case differences)")
 	flag.BoolVar(&config.ShowAliases, "aliases", false, "Show contributor aliases when normalization is enabled")
 	flag.Parse()
-	
+
 	// Validate flag dependencies
 	if config.ShowAliases && !config.NormalizeNames {
 		fmt.Fprintf(os.Stderr, "Warning: -aliases flag requires -normalize flag to be effective\n")
