@@ -4,12 +4,20 @@ import (
 	"sort"
 )
 
+const (
+	// Scoring weights for combined sorting
+	commitsWeight = 10
+	linesWeight   = 100
+)
+
+// Repository represents a Git repository with its contributor statistics
 type Repository struct {
 	Path         string
 	Name         string
 	Contributors map[string]*ContributorStats
 }
 
+// ContributorStats holds statistics for a single contributor
 type ContributorStats struct {
 	Name         string
 	Email        string
@@ -20,11 +28,13 @@ type ContributorStats struct {
 	Aliases      []string
 }
 
+// GlobalStats aggregates contributor statistics across multiple repositories
 type GlobalStats struct {
 	Contributors map[string]*ContributorStats
 	Repositories []*Repository
 }
 
+// NewGlobalStats creates a new GlobalStats instance
 func NewGlobalStats() *GlobalStats {
 	return &GlobalStats{
 		Contributors: make(map[string]*ContributorStats),
@@ -32,6 +42,7 @@ func NewGlobalStats() *GlobalStats {
 	}
 }
 
+// AddRepository adds a repository's statistics to the global stats
 func (gs *GlobalStats) AddRepository(repo *Repository) {
 	gs.Repositories = append(gs.Repositories, repo)
 
@@ -71,6 +82,7 @@ func (gs *GlobalStats) AddRepository(repo *Repository) {
 	}
 }
 
+// GetSortedContributors returns contributors sorted by the specified criteria
 func (gs *GlobalStats) GetSortedContributors(sortBy string, topN int) []*ContributorStats {
 	contributors := make([]*ContributorStats, 0, len(gs.Contributors))
 	for _, stats := range gs.Contributors {
@@ -88,8 +100,8 @@ func (gs *GlobalStats) GetSortedContributors(sortBy string, topN int) []*Contrib
 		})
 	case "combined":
 		sort.Slice(contributors, func(i, j int) bool {
-			scoreI := contributors[i].CommitCount*10 + contributors[i].LinesChanged/100
-			scoreJ := contributors[j].CommitCount*10 + contributors[j].LinesChanged/100
+			scoreI := contributors[i].CommitCount*commitsWeight + contributors[i].LinesChanged/linesWeight
+			scoreJ := contributors[j].CommitCount*commitsWeight + contributors[j].LinesChanged/linesWeight
 			return scoreI > scoreJ
 		})
 	default:
@@ -105,6 +117,7 @@ func (gs *GlobalStats) GetSortedContributors(sortBy string, topN int) []*Contrib
 	return contributors
 }
 
+// NewRepository creates a new Repository instance for the given path
 func NewRepository(path string) *Repository {
 	return &Repository{
 		Path:         path,

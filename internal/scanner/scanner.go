@@ -7,16 +7,19 @@ import (
 	"strings"
 )
 
+// Scanner finds Git repositories in directory hierarchies
 type Scanner struct {
 	foundRepos []string
 }
 
+// NewScanner creates a new Scanner instance
 func NewScanner() *Scanner {
 	return &Scanner{
 		foundRepos: make([]string, 0),
 	}
 }
 
+// ScanForRepositories finds all Git repositories in the given root directory
 func (s *Scanner) ScanForRepositories(rootDir string) ([]string, error) {
 	s.foundRepos = make([]string, 0)
 

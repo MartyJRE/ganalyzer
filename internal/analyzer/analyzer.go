@@ -11,11 +11,20 @@ import (
 	"ganalyzer/pkg/types"
 )
 
+const (
+	// Expected number of regex matches for commit parsing
+	expectedCommitMatches = 3
+	// Minimum number of parts expected in git log output
+	minLogParts = 3
+)
+
+// Analyzer analyzes Git repositories to extract contributor statistics
 type Analyzer struct {
 	normalizer *NameNormalizer
 	normalize  bool
 }
 
+// NewAnalyzer creates a new Analyzer instance without normalization
 func NewAnalyzer() *Analyzer {
 	return &Analyzer{
 		normalizer: NewNameNormalizer(),
@@ -23,6 +32,7 @@ func NewAnalyzer() *Analyzer {
 	}
 }
 
+// NewAnalyzerWithNormalization creates a new Analyzer with optional name normalization
 func NewAnalyzerWithNormalization(normalize bool) *Analyzer {
 	return &Analyzer{
 		normalizer: NewNameNormalizer(),
@@ -30,6 +40,7 @@ func NewAnalyzerWithNormalization(normalize bool) *Analyzer {
 	}
 }
 
+// AnalyzeRepository analyzes a single Git repository and returns its statistics
 func (a *Analyzer) AnalyzeRepository(repoPath string) (*types.Repository, error) {
 	repo := types.NewRepository(repoPath)
 
@@ -64,7 +75,7 @@ func (a *Analyzer) analyzeCommits(repo *types.Repository) error {
 	for scanner.Scan() {
 		line := scanner.Text()
 		matches := commitCountRegex.FindStringSubmatch(line)
-		if len(matches) != 3 {
+		if len(matches) != expectedCommitMatches {
 			continue
 		}
 
@@ -130,7 +141,7 @@ func (a *Analyzer) analyzeLineChanges(repo *types.Repository) error {
 		}
 
 		parts := strings.Split(line, "\t")
-		if len(parts) < 3 {
+		if len(parts) < minLogParts {
 			continue
 		}
 
