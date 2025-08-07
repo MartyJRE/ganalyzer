@@ -11,6 +11,14 @@ import (
 	"ganalyzer/pkg/types"
 )
 
+const (
+	// Default minimum name column width
+	minNameWidth = 20
+	// Extra padding for name column
+	namePadding = 2
+)
+
+// Config holds configuration options for formatting output
 type Config struct {
 	Directory      string
 	OutputFormat   string
@@ -20,12 +28,15 @@ type Config struct {
 	ShowAliases    bool
 }
 
+// Formatter handles output formatting for analysis results
 type Formatter struct{}
 
+// NewFormatter creates a new Formatter instance
 func NewFormatter() *Formatter {
 	return &Formatter{}
 }
 
+// Format outputs the analysis results in the specified format
 func (f *Formatter) Format(stats *types.GlobalStats, config Config, writer io.Writer) error {
 	contributors := stats.GetSortedContributors(config.SortBy, config.TopN)
 
@@ -42,6 +53,23 @@ func (f *Formatter) Format(stats *types.GlobalStats, config Config, writer io.Wr
 }
 
 func (f *Formatter) formatTable(contributors []*types.ContributorStats, repos []*types.Repository, config Config, writer io.Writer) error {
+	if err := f.writeHeader(writer, len(repos), repos); err != nil {
+		return err
+	}
+
+	if len(contributors) == 0 {
+		_, err := fmt.Fprintf(writer, "No contributors found.\n")
+		return err
+	}
+
+	if err := f.writeContributorsHeader(writer); err != nil {
+		return err
+	}
+
+	return f.writeContributors(writer, contributors, config)
+}
+
+func (f *Formatter) writeHeader(writer io.Writer, repoCount int, repos []*types.Repository) error {
 	if _, err := fmt.Fprintf(writer, "Git Repository Analysis\n"); err != nil {
 		return err
 	}
@@ -49,7 +77,7 @@ func (f *Formatter) formatTable(contributors []*types.ContributorStats, repos []
 		return err
 	}
 
-	if _, err := fmt.Fprintf(writer, "Found %d repositories:\n", len(repos)); err != nil {
+	if _, err := fmt.Fprintf(writer, "Found %d repositories:\n", repoCount); err != nil {
 		return err
 	}
 	for _, repo := range repos {
@@ -57,50 +85,58 @@ func (f *Formatter) formatTable(contributors []*types.ContributorStats, repos []
 			return err
 		}
 	}
-	if _, err := fmt.Fprintf(writer, "\n"); err != nil {
-		return err
-	}
+	_, err := fmt.Fprintf(writer, "\n")
+	return err
+}
 
-	if len(contributors) == 0 {
-		if _, err := fmt.Fprintf(writer, "No contributors found.\n"); err != nil {
-			return err
-		}
-		return nil
-	}
-
+func (f *Formatter) writeContributorsHeader(writer io.Writer) error {
 	if _, err := fmt.Fprintf(writer, "Top Contributors:\n"); err != nil {
 		return err
 	}
-	if _, err := fmt.Fprintf(writer, "================\n\n"); err != nil {
+	_, err := fmt.Fprintf(writer, "================\n\n")
+	return err
+}
+
+func (f *Formatter) writeContributors(writer io.Writer, contributors []*types.ContributorStats, config Config) error {
+	nameWidth := f.calculateNameWidth(contributors, config)
+	format := fmt.Sprintf("%%-%ds %%8s %%10s %%10s %%12s\n", nameWidth)
+
+	if err := f.writeTableHeader(writer, format, nameWidth); err != nil {
 		return err
 	}
 
-	nameWidth := 20
+	return f.writeContributorRows(writer, contributors, config, format)
+}
+
+func (f *Formatter) calculateNameWidth(contributors []*types.ContributorStats, config Config) int {
+	nameWidth := minNameWidth
 	for _, contributor := range contributors {
-		name := contributor.Name
-		if config.ShowAliases && config.NormalizeNames && len(contributor.Aliases) > 0 {
-			name = fmt.Sprintf("%s (aliases: %s)", contributor.Name, strings.Join(contributor.Aliases, ", "))
-		}
+		name := f.formatContributorName(contributor, config)
 		if len(name) > nameWidth {
 			nameWidth = len(name)
 		}
 	}
-	nameWidth += 2
+	return nameWidth + namePadding
+}
 
-	format := fmt.Sprintf("%%-%ds %%8s %%10s %%10s %%12s\n", nameWidth)
+func (f *Formatter) formatContributorName(contributor *types.ContributorStats, config Config) string {
+	if config.ShowAliases && config.NormalizeNames && len(contributor.Aliases) > 0 {
+		return fmt.Sprintf("%s (aliases: %s)", contributor.Name, strings.Join(contributor.Aliases, ", "))
+	}
+	return contributor.Name
+}
+
+func (f *Formatter) writeTableHeader(writer io.Writer, format string, nameWidth int) error {
 	if _, err := fmt.Fprintf(writer, format, "Name", "Commits", "Lines+", "Lines-", "Total Lines"); err != nil {
 		return err
 	}
-	if _, err := fmt.Fprintf(writer, format, strings.Repeat("-", nameWidth), "-------", "------", "------", "-----------"); err != nil {
-		return err
-	}
+	_, err := fmt.Fprintf(writer, format, strings.Repeat("-", nameWidth), "-------", "------", "------", "-----------")
+	return err
+}
 
+func (f *Formatter) writeContributorRows(writer io.Writer, contributors []*types.ContributorStats, config Config, format string) error {
 	for _, contributor := range contributors {
-		name := contributor.Name
-		if config.ShowAliases && config.NormalizeNames && len(contributor.Aliases) > 0 {
-			name = fmt.Sprintf("%s (aliases: %s)", contributor.Name, strings.Join(contributor.Aliases, ", "))
-		}
-
+		name := f.formatContributorName(contributor, config)
 		if _, err := fmt.Fprintf(writer, format,
 			name,
 			strconv.Itoa(contributor.CommitCount),
@@ -111,7 +147,6 @@ func (f *Formatter) formatTable(contributors []*types.ContributorStats, repos []
 			return err
 		}
 	}
-
 	return nil
 }
 

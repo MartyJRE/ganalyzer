@@ -80,7 +80,7 @@ linters:
     - noctx
     - nolintlint
     - rowserrcheck
-    - exportloopref
+    - copyloopvar
     - staticcheck
     - stylecheck
     - typecheck

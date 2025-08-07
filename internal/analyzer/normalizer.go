@@ -11,7 +11,6 @@ type NameNormalizer struct {
 	diacriticReplacer *strings.Replacer
 }
 
-
 // NewNameNormalizer creates a new name normalizer
 func NewNameNormalizer() *NameNormalizer {
 	// Common diacritic mappings - extend as needed
