@@ -55,7 +55,9 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "echo 'VERSION=${nextRelease.version}' >> $GITHUB_ENV && echo 'TAG=${nextRelease.gitTag}' >> $GITHUB_ENV"
+        "verifyReleaseCmd": "echo 'Preparing release ${nextRelease.version}'",
+        "prepareCmd": "echo 'VERSION=${nextRelease.version}' >> $GITHUB_ENV && echo 'TAG=${nextRelease.gitTag}' >> $GITHUB_ENV && echo 'Building binaries with version ${nextRelease.version}' && make VERSION=${nextRelease.version} build",
+        "publishCmd": "echo 'Published release ${nextRelease.version}'"
       }
     ],
     [

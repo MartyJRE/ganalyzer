@@ -9,11 +9,13 @@ import (
 	"ganalyzer/internal/analyzer"
 	"ganalyzer/internal/formatter"
 	"ganalyzer/internal/scanner"
+	"ganalyzer/internal/version"
 	"ganalyzer/pkg/types"
 )
 
 func main() {
 	var config formatter.Config
+	var showVersion bool
 
 	flag.StringVar(&config.Directory, "dir", ".", "Directory to scan for Git repositories")
 	flag.StringVar(&config.OutputFormat, "format", "table", "Output format: table, json, csv")
@@ -21,7 +23,13 @@ func main() {
 	flag.StringVar(&config.SortBy, "sort", "commits", "Sort by: commits, lines, combined")
 	flag.BoolVar(&config.NormalizeNames, "normalize", false, "Normalize contributor names (remove diacritics, punctuation, case differences)")
 	flag.BoolVar(&config.ShowAliases, "aliases", false, "Show contributor aliases when normalization is enabled")
+	flag.BoolVar(&showVersion, "version", false, "Show version information")
 	flag.Parse()
+
+	if showVersion {
+		fmt.Println(version.Info())
+		os.Exit(0)
+	}
 
 	// Validate flag dependencies
 	if config.ShowAliases && !config.NormalizeNames {

@@ -124,13 +124,17 @@ jobs:
       env:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
+        VERSION: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+        GIT_COMMIT: ${{ github.sha }}
+        BUILD_DATE: ${{ steps.date.outputs.date }}
       run: |
         mkdir -p build
         EXT=""
         if [ "$GOOS" = "windows" ]; then
           EXT=".exe"
         fi
-        go build -ldflags="-s -w" -o build/ganalyzer-${GOOS}-${GOARCH}${EXT} ./cmd/ganalyzer
+        LDFLAGS="-X ganalyzer/internal/version.Version=${VERSION} -X ganalyzer/internal/version.GitCommit=${GIT_COMMIT} -X ganalyzer/internal/version.BuildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ) -s -w"
+        go build -ldflags="$LDFLAGS" -o build/ganalyzer-${GOOS}-${GOARCH}${EXT} ./cmd/ganalyzer
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
