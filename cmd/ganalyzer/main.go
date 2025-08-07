@@ -9,6 +9,7 @@ import (
 	"ganalyzer/internal/analyzer"
 	"ganalyzer/internal/formatter"
 	"ganalyzer/internal/scanner"
+	"ganalyzer/internal/version"
 	"ganalyzer/pkg/types"
 )
 
@@ -26,7 +27,7 @@ func main() {
 	flag.Parse()
 
 	if showVersion {
-		fmt.Println("ganalyzer version dev")
+		fmt.Println(version.Info())
 		os.Exit(0)
 	}
 

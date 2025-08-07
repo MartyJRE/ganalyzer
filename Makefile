@@ -14,6 +14,14 @@ GOGET=$(GOCMD) get
 GOFMT=$(GOCMD) fmt
 GOVET=$(GOCMD) vet
 
+# Version information
+VERSION ?= dev
+GIT_COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+# Build flags
+LDFLAGS=-ldflags "-X ganalyzer/internal/version.Version=$(VERSION) -X ganalyzer/internal/version.GitCommit=$(GIT_COMMIT) -X ganalyzer/internal/version.BuildDate=$(BUILD_DATE) -s -w"
+
 # Default target
 all: test build
 
@@ -21,7 +29,7 @@ all: test build
 build:
 	@echo "Building $(BINARY_NAME)..."
 	@mkdir -p $(BUILD_DIR)
-	$(GOBUILD) -o $(BUILD_DIR)/$(BINARY_NAME) ./$(CMD_PATH)
+	$(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) ./$(CMD_PATH)
 
 # Run tests
 test:
@@ -54,7 +62,7 @@ run: build
 # Install the application to GOPATH/bin
 install:
 	@echo "Installing $(BINARY_NAME)..."
-	$(GOBUILD) -o $(GOPATH)/bin/$(BINARY_NAME) ./$(CMD_PATH)
+	$(GOBUILD) $(LDFLAGS) -o $(GOPATH)/bin/$(BINARY_NAME) ./$(CMD_PATH)
 
 # Format code
 fmt:
