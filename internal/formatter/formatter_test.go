@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"ganalyzer/pkg/types"
 )
@@ -150,6 +151,17 @@ func TestFormatter_EmptyStats(t *testing.T) {
 	output := buf.String()
 	if !strings.Contains(output, "No contributors found") {
 		t.Error("Expected 'No contributors found' message for empty stats")
+	}
+}
+
+func TestFormatter_CalculateNameWidthWithUnicode(t *testing.T) {
+	formatter := NewFormatter()
+	unicodeName := strings.Repeat("á", 21)
+	contributors := []*types.ContributorStats{{Name: unicodeName}}
+	width := formatter.calculateNameWidth(contributors, Config{})
+	expected := utf8.RuneCountInString(unicodeName) + namePadding
+	if width != expected {
+		t.Fatalf("expected width %d, got %d", expected, width)
 	}
 }
 

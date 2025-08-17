@@ -7,6 +7,7 @@ import (
 	"io"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"ganalyzer/pkg/types"
 )
@@ -112,8 +113,9 @@ func (f *Formatter) calculateNameWidth(contributors []*types.ContributorStats, c
 	nameWidth := minNameWidth
 	for _, contributor := range contributors {
 		name := f.formatContributorName(contributor, config)
-		if len(name) > nameWidth {
-			nameWidth = len(name)
+		nameLen := utf8.RuneCountInString(name)
+		if nameLen > nameWidth {
+			nameWidth = nameLen
 		}
 	}
 	return nameWidth + namePadding
